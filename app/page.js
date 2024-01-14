@@ -6,37 +6,25 @@ import Product from './components/Product';
 import HeroBanner from './components/HeroBanner';
 import FooterBanner from './components/FooterBanner';
 import { Footer } from './components';
-
-
-const Product_item = ({ id, name, price }) => (
-  <p>
-    {id}
-    {name}
-    {price}
-  </p>
-
-);
-
-
-const ProductsTable = ({ products }) => (
-  <>
-
-    {products.map((product) => (
-      <Product_item key={product.id} {...product} />
-    ))}
-  </>
-
-);
+import { client } from './lib/client';
 
 
 
-export default function Home() {
 
-  const products = [
-    { id: 1, name: 'Product 1', price: 100 },
-    { id: 2, name: 'Product 2', price: 200 },
-    // ... more products
-  ];
+export default function Home({ products, bannerData }) {
+
+  const getServerSideProps = async () => {
+  
+    const query = '*[_type == "product"]';
+    const products = await client.fetch(query);
+  
+    const bannerQuery = '*[_type == "banner"]';
+    const bannerData = await client.fetch(bannerQuery);
+  
+    return {
+      props: { products, bannerData }
+    }
+  }
 
 
 
@@ -44,6 +32,12 @@ export default function Home() {
 
     <>
       <HeroBanner />
+
+      {
+        console.log(products)
+      }
+
+
       <div className='products-heading'>
         <h1>Best Selling Products</h1>
 
@@ -51,19 +45,17 @@ export default function Home() {
       </div>
 
 
-
       <div className='products-container'>
+        {products?.map((product) => (product.name))}
 
       </div>
 
-      <ProductsTable products={products} />
-
-
       <Footer />
-
 
     </>
 
-
   )
 }
+
+
+
